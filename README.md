@@ -1,0 +1,45 @@
+# Hunch
+
+![Searching the NixOS manual for "remote install": the paragraph about continuing the installation over SSH is highlighted at 0.86, the bar reads "1 of 13 · 86% · on this page · 76%", and ticks on the right edge mark every hit.](docs/hunch.png)
+
+Ctrl+F with a hunch.
+Ask a page a question and the paragraph that answers it lights up, with a probability next to it.
+It also tells you when the answer is not on the page at all.
+
+Powered by [TypeSafe AI](https://docs.typesafe.ai).
+Jev is not an LLM. It does not generate text. When you use this extension you send a question to the API along the lines of:
+Does *this* element on the page describes X.
+Jev then goes through every element on that page and answers that questions with yes/no and a probability.
+The extension then highlights the elements with the highest probability of being the answer.
+
+## Use
+
+- `Alt+F` on macOS, `Ctrl+Shift+F` elsewhere; Cmd+F and Ctrl+F stay the normal find. Change it in Hunch's settings page: click the shortcut field and press the keys you want.
+- Type in a search query. This can be a word your're looking for, a question, a sentence. Enter/Shift-Enter cycles you to the best first one and you can see all results on the scrollbar just like with normal search.
+
+To use this you need to have a Typesafe API. You can add it in the settings of the extension. To get one, go to https://console.typesafe.ai/keys
+
+## Where it cannot run
+
+Firefox does not let any extension touch its built-in PDF viewer, `about:` pages, reader view, or addons.mozilla.org. On those the toolbar icon briefly shows an `n/a` badge and nothing else happens.
+
+## Develop
+
+```sh
+nix develop
+npm install
+npm run build
+npm run watch          # rebuild on change
+npm run check          # typecheck, biome (TS + CSS lint and formatting), build, web-ext lint
+npm run lint:fix       # apply biome's fixes and formatting
+```
+
+Load `dist/manifest.json` as a temporary add-on at `about:debugging#/runtime/this-firefox`.
+
+All questions and thresholds live in `src/shared/questions.ts`. If you have any modification to how the search works, that's the best place to do them.
+
+## How big pages are handled
+
+One annoying thing about Jev today is the very small context window: 64k tokens.
+That means both the state and the questions. Now I'm sure that's going to grow substantially in the future, but for right now my way around the issue when it comes to massive pages (say for example the curl man page), is to chunk the request into 160 blocks each, and send them all in parallel.
+Results get drawn as soon as they come back. Normal pages will fit into one request most of the time.
