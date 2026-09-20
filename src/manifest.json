@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Hunch",
+  "version": "0.1.0",
+  "description": "Ctrl+F with a hunch. Ask a page a question and the paragraph that answers it lights up, with a probability. Tells you when the answer isn't there.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "hunch@tymscar.com",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["websiteContent"]
+      }
+    }
+  },
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["https://api.typesafe.ai/*"],
+  "background": {
+    "scripts": ["background.js"],
+    "type": "module"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "Hunch"
+  },
+  "commands": {
+    "toggle-hunch": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F",
+        "mac": "Alt+F"
+      },
+      "description": "Open Hunch on this page"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["ui.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

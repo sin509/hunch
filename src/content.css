@@ -1,0 +1,30 @@
+.hunch-hl {
+  /* biome-ignore lint/complexity/noImportantStyles: must win over the host page's own background */
+  background: rgba(251, 191, 36, var(--hunch-alpha, 0.3)) !important;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, var(--hunch-alpha, 0.3));
+  border-radius: 3px;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+.hunch-hl.hunch-rel {
+  position: relative;
+}
+.hunch-hl.hunch-rel::after {
+  content: attr(data-hunch-p);
+  position: absolute;
+  top: -0.9em;
+  right: 0;
+  font: 10px / 1 monospace;
+  color: #92400e;
+  background: #fef3c7;
+  padding: 1px 4px;
+  border-radius: 3px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.hunch-current {
+  /* biome-ignore lint/complexity/noImportantStyles: must win over the host page's own outline */
+  outline: 3px solid #ff5b5b !important;
+  outline-offset: 2px;
+}
