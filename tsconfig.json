@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "types": ["webextension-polyfill"]
   },
-  "include": ["src", "test", "build.mjs"]
+  "include": ["src", "build.mjs"]
 }

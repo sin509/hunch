@@ -14,14 +14,14 @@ The extension then highlights the elements with the highest probability of being
 
 ## Use
 
-- `Alt+F` on macOS, `Ctrl+Shift+F` elsewhere; Cmd+F and Ctrl+F stay the normal find. Change it in Hunch's settings page: click the shortcut field and press the keys you want.
+- `Alt+F` on macOS, `Ctrl+Shift+F` elsewhere; Cmd+F and Ctrl+F stay the normal find. Change it in Hunch's settings page: click the shortcut field and press the keys you want. In Chrome, change it at chrome://extensions/shortcuts, where it is listed as "Activate the extension".
 - Type in a search query. This can be a word your're looking for, a question, a sentence. Enter/Shift-Enter cycles you to the best first one and you can see all results on the scrollbar just like with normal search.
 
 To use this you need to have a Typesafe API. You can add it in the settings of the extension. To get one, go to https://console.typesafe.ai/keys
 
 ## Where it cannot run
 
-Firefox does not let any extension touch its built-in PDF viewer, `about:` pages, reader view, or addons.mozilla.org. On those the toolbar icon briefly shows an `n/a` badge and nothing else happens.
+Browsers do not let extensions touch their built-in PDF viewer, `about:` and `chrome://` pages, reader view, or their extension stores. On those the toolbar icon briefly shows an `n/a` badge and nothing else happens.
 
 ## Develop
 
@@ -29,12 +29,15 @@ Firefox does not let any extension touch its built-in PDF viewer, `about:` pages
 nix develop
 npm install
 npm run build
-npm run watch          # rebuild on change
-npm run check          # typecheck, biome (TS + CSS lint and formatting), build, web-ext lint
-npm run lint:fix       # apply biome's fixes and formatting
+npm run watch
+npm run check
+npm run lint:fix
 ```
 
-Load `dist/manifest.json` as a temporary add-on at `about:debugging#/runtime/this-firefox`.
+The build produces `dist/firefox` and `dist/chrome`.
+
+In Firefox, load `dist/firefox/manifest.json` as a temporary add-on at `about:debugging#/runtime/this-firefox`.
+In Chrome, turn on Developer mode at `chrome://extensions` and click on `Load unpacked` on the `dist/chrome` folder.
 
 All questions and thresholds live in `src/shared/questions.ts`. If you have any modification to how the search works, that's the best place to do them.
 

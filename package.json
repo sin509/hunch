@@ -14,12 +14,12 @@
     "build": "node build.mjs",
     "watch": "node build.mjs --watch",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "run": "web-ext run --source-dir dist",
-    "lint:ext": "web-ext lint --source-dir dist",
     "lint": "biome check src build.mjs",
     "lint:fix": "biome check --write src build.mjs",
-    "check": "npm run typecheck && npm run lint && npm run build && npm run lint:ext"
+    "lint:ext": "web-ext lint --source-dir dist/firefox",
+    "check": "npm run typecheck && npm run lint && npm run build && npm run lint:ext",
+    "run:firefox": "web-ext run --source-dir dist/firefox",
+    "run:chrome": "web-ext run -t chromium --source-dir dist/chrome"
   },
   "dependencies": {
     "@typesafe-ai/sdk": "^0.6.0"
@@ -28,7 +28,6 @@
     "@types/webextension-polyfill": "^0.12.1",
     "esbuild": "^0.25.0",
     "typescript": "^5.6.0",
-    "vitest": "^3.0.0",
     "webextension-polyfill": "^0.12.0"
   }
 }

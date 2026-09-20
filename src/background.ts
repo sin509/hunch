@@ -36,18 +36,12 @@ async function hasContentScript(tabId: number): Promise<boolean> {
 async function unavailable(tabId: number) {
   await browser.action.setBadgeBackgroundColor({ tabId, color: "#ff5b5b" });
   await browser.action.setBadgeText({ tabId, text: "n/a" });
-  await browser.action.setTitle({ tabId, title: "Hunch can't run here: Firefox blocks extensions on this page" });
+  await browser.action.setTitle({ tabId, title: "Hunch can't run here: the browser blocks extensions on this page" });
   setTimeout(() => void browser.action.setBadgeText({ tabId, text: "" }), 2500);
 }
 
 browser.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === "install" && !(await loadSettings()).apiKey) void browser.runtime.openOptionsPage();
-});
-
-browser.commands.onCommand.addListener(async (command) => {
-  if (command !== "toggle-hunch") return;
-  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-  void toggle(tab?.id);
 });
 
 browser.action.onClicked.addListener((tab) => void toggle(tab.id));

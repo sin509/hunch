@@ -1,31 +1,59 @@
-import { cpSync, mkdirSync, rmSync } from "node:fs";
+import { cpSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import * as esbuild from "esbuild";
 
 const watch = process.argv.includes("--watch");
-rmSync("dist", { recursive: true, force: true });
-mkdirSync("dist", { recursive: true });
-cpSync("src/manifest.json", "dist/manifest.json");
-cpSync("src/options.html", "dist/options.html");
-cpSync("src/content.css", "dist/content.css");
-cpSync("src/content/ui.css", "dist/ui.css");
-cpSync("src/icons", "dist/icons", { recursive: true });
+const base = JSON.parse(readFileSync("src/manifest.json", "utf8"));
 
-const ctx = await esbuild.context({
-  entryPoints: {
-    background: "src/background.ts",
-    content: "src/content.ts",
-    options: "src/options.ts",
+const manifests = {
+  firefox: {
+    ...base,
+    background: { scripts: ["background.js"], type: "module" },
+    browser_specific_settings: {
+      gecko: {
+        id: "hunch@tymscar.com",
+        strict_min_version: "140.0",
+        data_collection_permissions: { required: ["websiteContent"] },
+      },
+      gecko_android: { strict_min_version: "142.0" },
+    },
   },
+  chrome: {
+    ...base,
+    background: { service_worker: "background.js" },
+  },
+};
+
+const assets = {
+  "src/options.html": "options.html",
+  "src/content.css": "content.css",
+  "src/content/ui.css": "ui.css",
+  "src/icons": "icons",
+};
+
+rmSync("dist", { recursive: true, force: true });
+const bundler = await esbuild.context({
+  entryPoints: { background: "src/background.ts", content: "src/content.ts", options: "src/options.ts" },
   bundle: true,
   format: "iife",
-  target: "firefox128",
-  outdir: "dist",
+  target: ["firefox128", "chrome120"],
+  outdir: "dist/bundle",
   sourcemap: watch ? "inline" : false,
   logLevel: "info",
+  plugins: [{ name: "layout", setup: (build) => build.onEnd(layoutBrowserFolders) }],
 });
 
-if (watch) await ctx.watch();
+function layoutBrowserFolders() {
+  for (const [browser, manifest] of Object.entries(manifests)) {
+    const dir = `dist/${browser}`;
+    rmSync(dir, { recursive: true, force: true });
+    cpSync("dist/bundle", dir, { recursive: true });
+    for (const [from, to] of Object.entries(assets)) cpSync(from, `${dir}/${to}`, { recursive: true });
+    writeFileSync(`${dir}/manifest.json`, `${JSON.stringify(manifest, null, 2)}\n`);
+  }
+}
+
+if (watch) await bundler.watch();
 else {
-  await ctx.rebuild();
-  await ctx.dispose();
+  await bundler.rebuild();
+  await bundler.dispose();
 }
