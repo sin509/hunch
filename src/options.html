@@ -11,6 +11,7 @@
   .row input:focus { border-color: #d97706; outline: none; box-shadow: 0 0 0 2px rgba(217,119,6,.25); }
   button.secondary { margin-top: 6px; background: #fff; color: #111; }
   #shortcutNote { display: block; min-height: 1.2em; margin-top: 4px; }
+  button.link { all: unset; color: #1d4ed8; text-decoration: underline; cursor: pointer; font: inherit; }
   button { margin-top: 20px; font: inherit; padding: 8px 16px; border-radius: 6px; border: 1px solid #333; background: #111; color: #fff; cursor: pointer; }
   #saved { margin-left: 10px; color: #15803d; }
 </style></head>
@@ -20,7 +21,7 @@
   <p id="nokey" style="display:none;padding:10px 12px;border-radius:6px;background:#fef3c7;color:#92400e">You need a TypeSafe API key before the first search. Create one at <a href="https://console.typesafe.ai/keys" target="_blank">console.typesafe.ai/keys</a>, paste it below, and save.</p>
   <label>TypeSafe API key <input id="apiKey" type="password" placeholder="apikey_…"></label>
   <label>Model <input id="model" type="text" placeholder="jev-latest"></label>
-  <label>Shortcut <small>Click the field and press the keys you want.</small>
+  <label>Shortcut <small id="shortcutHint">Click the field and press the keys you want.</small>
     <span class="row">
       <input id="shortcut" type="text" readonly placeholder="…">
       <button id="resetShortcut" type="button" class="secondary">Reset to default</button>

@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill";
 
-const COMMAND = "toggle-hunch";
+/** The browser's built-in "activate the extension" command; it fires action.onClicked, which toggles the bar. */
+const COMMAND = "_execute_action";
 
 export async function shortcutLabel(): Promise<string> {
   const [command, platform] = await Promise.all([
@@ -16,6 +17,13 @@ export async function shortcutLabel(): Promise<string> {
     .map((key) => (key === "MacCtrl" ? "Ctrl" : key === "Ctrl" && mac ? "Cmd" : key === "Command" ? "Cmd" : key))
     .join("+");
 }
+
+// As far as I can tell, only on firefox this works, but who knows
+export const canRebindShortcut = typeof browser.commands.update === "function";
+
+/** Where Chrome users change it instead. A plain href to a chrome:// URL is blocked, tabs.create is not. */
+export const SHORTCUTS_PAGE = "chrome://extensions/shortcuts";
+export const openShortcutsPage = () => browser.tabs.create({ url: SHORTCUTS_PAGE });
 
 export const setShortcut = (shortcut: string) => browser.commands.update({ name: COMMAND, shortcut });
 

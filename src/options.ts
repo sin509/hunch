@@ -1,6 +1,14 @@
 import browser from "webextension-polyfill";
 import { DEFAULT_SETTINGS, hasApiAccess, loadSettings, requestApiAccess, saveSettings } from "./shared/settings";
-import { commandShortcutFromEvent, resetShortcut, setShortcut, shortcutLabel } from "./shared/shortcut";
+import {
+  canRebindShortcut,
+  commandShortcutFromEvent,
+  openShortcutsPage,
+  resetShortcut,
+  SHORTCUTS_PAGE,
+  setShortcut,
+  shortcutLabel,
+} from "./shared/shortcut";
 
 const field = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const apiKey = field<HTMLInputElement>("apiKey");
@@ -45,7 +53,18 @@ field("resetShortcut").addEventListener("click", async () => {
 });
 
 async function load() {
-  await showShortcut();
+  if (!canRebindShortcut) {
+    shortcut.disabled = true;
+    field("shortcutHint").hidden = true;
+    field("resetShortcut").hidden = true;
+    const shortcutsPageButton = document.createElement("button");
+    shortcutsPageButton.type = "button";
+    shortcutsPageButton.className = "link";
+    shortcutsPageButton.textContent = SHORTCUTS_PAGE;
+    shortcutsPageButton.addEventListener("click", () => void openShortcutsPage());
+    shortcutNote.replaceChildren("Change it at ", shortcutsPageButton);
+  }
+  shortcut.value = await shortcutLabel();
   const s = await loadSettings();
   apiKey.value = s.apiKey;
   model.value = s.model;
