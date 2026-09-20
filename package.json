@@ -1,0 +1,34 @@
+{
+  "name": "hunch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ctrl+F with a hunch. A Firefox extension that lights up the paragraph that answers your question",
+  "author": "tymscar",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tymscar/hunch"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "run": "web-ext run --source-dir dist",
+    "lint:ext": "web-ext lint --source-dir dist",
+    "lint": "biome check src build.mjs",
+    "lint:fix": "biome check --write src build.mjs",
+    "check": "npm run typecheck && npm run lint && npm run build && npm run lint:ext"
+  },
+  "dependencies": {
+    "@typesafe-ai/sdk": "^0.6.0"
+  },
+  "devDependencies": {
+    "@types/webextension-polyfill": "^0.12.1",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0",
+    "webextension-polyfill": "^0.12.0"
+  }
+}
