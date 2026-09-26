@@ -1,5 +1,5 @@
 import browser from "webextension-polyfill";
-import { DEFAULT_SETTINGS, hasApiAccess, loadSettings, requestApiAccess, saveSettings } from "./shared/settings";
+import { DEFAULT_SETTINGS, listModels, loadSettings, requestApiAccess, saveSettings } from "./shared/settings";
 import {
   canRebindShortcut,
   commandShortcutFromEvent,
@@ -13,7 +13,8 @@ import {
 
 const field = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const apiKey = field<HTMLInputElement>("apiKey");
-const model = field<HTMLInputElement>("model");
+const model = field<HTMLSelectElement>("model");
+const modelNote = field("modelNote");
 const banner = field("nokey");
 const saved = field("saved");
 
@@ -53,6 +54,31 @@ field("resetShortcut").addEventListener("click", async () => {
   await showShortcut("Back to the default");
 });
 
+interface ModelChoice {
+  name: string;
+  description: string;
+}
+
+async function modelChoices(apiKey: string, selected: string): Promise<{ models: ModelChoice[]; note: string }> {
+  const current = { name: selected, description: "" };
+  if (!apiKey) return { models: [current], note: "Save an API key to see the models you can use." };
+  try {
+    const models = await listModels(apiKey);
+    const selectedIsListed = models.some((m) => m.name === selected);
+    return { models: selectedIsListed ? models : [current, ...models], note: "" };
+  } catch (e) {
+    return { models: [current], note: `Could not list models: ${e instanceof Error ? e.message : String(e)}` };
+  }
+}
+
+async function loadModels(apiKey: string, selected: string) {
+  const { models, note } = await modelChoices(apiKey, selected);
+  model.replaceChildren(...models.map((m) => new Option(labelFor(m), m.name, false, m.name === selected)));
+  modelNote.textContent = note;
+}
+
+const labelFor = (m: ModelChoice) => (m.description ? `${m.name} (${m.description})` : m.name);
+
 async function load() {
   if (!canRebindShortcut) {
     shortcut.disabled = true;
@@ -72,19 +98,19 @@ async function load() {
   shortcut.value = await shortcutLabel();
   const s = await loadSettings();
   apiKey.value = s.apiKey;
-  model.value = s.model;
+  await loadModels(s.apiKey, s.model);
   showKeyBanner(Boolean(s.apiKey));
 }
 
 async function save() {
   const s = {
     apiKey: apiKey.value.trim(),
-    model: model.value.trim() || DEFAULT_SETTINGS.model,
+    model: model.value || DEFAULT_SETTINGS.model,
   };
+  await requestApiAccess();
   await saveSettings(s);
-
-  if (!(await hasApiAccess())) await requestApiAccess();
   showKeyBanner(Boolean(s.apiKey));
+  await loadModels(s.apiKey, s.model);
   saved.textContent = "Saved";
   setTimeout(() => (saved.textContent = ""), 1500);
 }

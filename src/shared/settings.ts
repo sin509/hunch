@@ -1,3 +1,4 @@
+import { type ModelCard, TypeSafeClient } from "@typesafe-ai/sdk";
 import browser from "webextension-polyfill";
 
 export interface Settings {
@@ -20,3 +21,7 @@ export const API_ORIGIN = { origins: ["https://api.typesafe.ai/*"] };
 
 export const hasApiAccess = () => browser.permissions.contains(API_ORIGIN);
 export const requestApiAccess = () => browser.permissions.request(API_ORIGIN);
+
+export function listModels(apiKey: string): Promise<ModelCard[]> {
+  return new TypeSafeClient({ apiKey, dangerouslyAllowBrowser: true }).models.list();
+}
