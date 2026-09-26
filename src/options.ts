@@ -5,6 +5,7 @@ import {
   commandShortcutFromEvent,
   openShortcutsPage,
   resetShortcut,
+  runningIn,
   SHORTCUTS_PAGE,
   setShortcut,
   shortcutLabel,
@@ -57,12 +58,16 @@ async function load() {
     shortcut.disabled = true;
     field("shortcutHint").hidden = true;
     field("resetShortcut").hidden = true;
-    const shortcutsPageButton = document.createElement("button");
-    shortcutsPageButton.type = "button";
-    shortcutsPageButton.className = "link";
-    shortcutsPageButton.textContent = SHORTCUTS_PAGE;
-    shortcutsPageButton.addEventListener("click", () => void openShortcutsPage());
-    shortcutNote.replaceChildren("Change it at ", shortcutsPageButton);
+    if (runningIn() === "chrome") {
+      const shortcutsPageButton = document.createElement("button");
+      shortcutsPageButton.type = "button";
+      shortcutsPageButton.className = "link";
+      shortcutsPageButton.textContent = SHORTCUTS_PAGE;
+      shortcutsPageButton.addEventListener("click", () => void openShortcutsPage());
+      shortcutNote.replaceChildren("Change it at ", shortcutsPageButton);
+    } else {
+      shortcutNote.textContent = "This browser does not let extensions change their shortcut.";
+    }
   }
   shortcut.value = await shortcutLabel();
   const s = await loadSettings();

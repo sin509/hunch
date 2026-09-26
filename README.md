@@ -1,6 +1,9 @@
-# Hunch
+# <img src="src/icons/icon.svg" width="32" alt="" align="top"> Hunch
 
-![Searching the NixOS manual for "remote install": the paragraph about continuing the installation over SSH is highlighted at 0.86, the bar reads "1 of 13 · 86% · on this page · 76%", and ticks on the right edge mark every hit.](docs/hunch.png)
+<p align="center">
+  <img src="docs/hunch.png" width="640" alt="Searching the NixOS manual for &quot;remote install&quot; on a Mac: the paragraph about continuing the installation over SSH is highlighted at 0.86, the bar reads 1 of 13 · 86% · on this page · 76%, and ticks on the right edge mark every hit.">
+  <img src="docs/hunch-iphone.png" width="200" alt="The same search on an iPhone in Safari: the SSH paragraph is highlighted at 0.84, and the bar reads 1 of 10 · 84% · on this page · 84%.">
+</p>
 
 Ctrl+F with a hunch.
 Ask a page a question and the paragraph that answers it lights up, with a probability next to it.
@@ -34,7 +37,7 @@ npm run check
 npm run lint:fix
 ```
 
-The build produces `dist/firefox` and `dist/chrome`.
+The build produces `dist/firefox`, `dist/chrome`, and `dist/safari`.
 
 In Firefox, load `dist/firefox/manifest.json` as a temporary add-on at `about:debugging#/runtime/this-firefox`.
 In Chrome, turn on Developer mode at `chrome://extensions` and click on `Load unpacked` on the `dist/chrome` folder.

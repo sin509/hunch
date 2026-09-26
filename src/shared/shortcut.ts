@@ -4,6 +4,7 @@ import browser from "webextension-polyfill";
 const COMMAND = "_execute_action";
 
 export async function shortcutLabel(): Promise<string> {
+  if (!browser.commands) return "the toolbar button"; // iOS Safari has no keyboard shortcuts at all
   const [command, platform] = await Promise.all([
     browser.commands.getAll().then((all) => all.find((c) => c.name === COMMAND)),
     browser.runtime.getPlatformInfo(),
@@ -19,7 +20,18 @@ export async function shortcutLabel(): Promise<string> {
 }
 
 // As far as I can tell, only on firefox this works, but who knows
-export const canRebindShortcut = typeof browser.commands.update === "function";
+export const canRebindShortcut = typeof browser.commands?.update === "function";
+
+export const runningIn = (): "firefox" | "chrome" | "safari" | "other" => {
+  const scheme = browser.runtime.getURL("").split(":")[0];
+  return scheme === "moz-extension"
+    ? "firefox"
+    : scheme === "chrome-extension"
+      ? "chrome"
+      : scheme === "safari-web-extension"
+        ? "safari"
+        : "other";
+};
 
 /** Where Chrome users change it instead. A plain href to a chrome:// URL is blocked, tabs.create is not. */
 export const SHORTCUTS_PAGE = "chrome://extensions/shortcuts";

@@ -32,6 +32,8 @@ export async function answer(
       ms: Math.round(performance.now() - started),
     });
 
+  if (chunks.length === 0) return report();
+
   await parallel(chunks, MAX_CONCURRENT_REQUESTS, signal, async (blocks) => {
     try {
       const result = await client.systemOne(
@@ -45,10 +47,9 @@ export async function answer(
         { signal },
       );
       for (const [id, a] of Object.entries(result.answers)) scores[id as BlockId] = a.noul;
-    } catch (e) {
+    } catch {
       if (signal.aborted) return;
       failed++;
-      console.warn("[hunch] chunk failed", e);
     }
     done++;
     report();

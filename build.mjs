@@ -21,6 +21,11 @@ const manifests = {
     ...base,
     background: { service_worker: "background.js" },
   },
+  safari: {
+    ...base,
+    background: { scripts: ["background.js"] },
+    options_ui: { page: "options.html" },
+  },
 };
 
 const assets = {

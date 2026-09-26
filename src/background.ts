@@ -6,7 +6,7 @@ import { shortcutLabel } from "./shared/shortcut";
 
 async function toggle(tabId: number | undefined) {
   if (tabId === undefined) return;
-  if (!(await hasApiAccess())) await requestApiAccess();
+  await requestApiAccess();
   if (!(await ensureContentScript(tabId))) return unavailable(tabId);
   await sendToTab(tabId, { type: "toggle" });
 }
@@ -57,17 +57,17 @@ browser.runtime.onConnect.addListener((port) => {
   };
 
   async function run(req: Search) {
-    const settings = await loadSettings();
-    if (!settings.apiKey) {
-      void browser.runtime.openOptionsPage();
-      return emit({ type: "failure", message: "No API key yet. Paste one in the settings tab that just opened." });
-    }
-    if (!(await hasApiAccess()))
-      return emit({
-        type: "failure",
-        message: `Hunch needs permission to reach api.typesafe.ai. Press ${await shortcutLabel()} again and accept the prompt.`,
-      });
     try {
+      const settings = await loadSettings();
+      if (!settings.apiKey) {
+        void browser.runtime.openOptionsPage();
+        return emit({ type: "failure", message: "No API key yet. Paste one in the settings tab that just opened." });
+      }
+      if (!(await hasApiAccess()))
+        return emit({
+          type: "failure",
+          message: `Hunch needs permission to reach api.typesafe.ai. Press ${await shortcutLabel()} again and accept the prompt.`,
+        });
       await answer(req, settings, abort.signal, emit);
     } catch (e) {
       emit({ type: "failure", message: e instanceof Error ? e.message : String(e) });

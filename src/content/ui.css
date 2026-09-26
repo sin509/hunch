@@ -25,22 +25,25 @@
   right: 0;
   bottom: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  padding: 6px 12px;
+  padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px));
   background: #1c1b22;
   color: #fbfbfe;
   border-top: 1px solid #3a3944;
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
 }
 .hunch-input {
+  flex: 1 1 200px;
+  min-width: 0;
   font: inherit;
   color: #fbfbfe;
   background: #2b2a33;
   border: 1px solid #52525e;
   border-radius: 4px;
   padding: 5px 10px;
-  width: 360px;
+  max-width: 360px;
   outline: none;
   margin: 0;
 }
@@ -145,4 +148,17 @@
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 2px;
+}
+
+@media (max-width: 600px) {
+  .hunch-input {
+    flex-basis: 100%;
+    max-width: none;
+  }
+  .hunch-meta {
+    display: none;
+  }
+  .hunch-marks {
+    bottom: 80px;
+  }
 }
