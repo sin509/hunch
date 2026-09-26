@@ -23,7 +23,7 @@ const manifests = {
   },
   safari: {
     ...base,
-    background: { scripts: ["background.js"] },
+    background: { scripts: ["background.js"], persistent: false },
     options_ui: { page: "options.html" },
   },
 };
