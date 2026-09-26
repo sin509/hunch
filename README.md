@@ -49,3 +49,7 @@ All questions and thresholds live in `src/shared/questions.ts`. If you have any 
 One annoying thing about Jev today is the very small context window: 64k tokens.
 That means both the state and the questions. Now I'm sure that's going to grow substantially in the future, but for right now my way around the issue when it comes to massive pages (say for example the curl man page), is to chunk the request into 160 blocks each, and send them all in parallel.
 Results get drawn as soon as they come back. Normal pages will fit into one request most of the time.
+
+## Privacy and licence
+
+Page text is sent to TypeSafe only while the bar is open on that page, and nothing else is collected. Details in [PRIVACY.md](PRIVACY.md). MIT licensed, see [LICENSE](LICENSE).
