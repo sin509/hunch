@@ -22,6 +22,10 @@ The extension then highlights the elements with the highest probability of being
 
 To use this you need to have a Typesafe API. You can add it in the settings of the extension. To get one, go to https://console.typesafe.ai/keys
 
+
+https://github.com/user-attachments/assets/606156ad-5529-4db0-b348-4942c0b6c24b
+
+
 ## Where it cannot run
 
 Browsers do not let extensions touch their built-in PDF viewer, `about:` and `chrome://` pages, reader view, or their extension stores. On those the toolbar icon briefly shows an `n/a` badge and nothing else happens.
