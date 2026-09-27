@@ -1,8 +1,7 @@
 # <img src="src/icons/icon.svg" width="32" alt="" align="top"> Hunch
 
 <p align="center">
-  <img src="docs/hunch.png" width="640" alt="Searching the NixOS manual for &quot;remote install&quot; on a Mac: the paragraph about continuing the installation over SSH is highlighted at 0.86, the bar reads 1 of 13 · 86% · on this page · 76%, and ticks on the right edge mark every hit.">
-  <img src="docs/hunch-iphone.png" width="200" alt="The same search on an iPhone in Safari: the SSH paragraph is highlighted at 0.84, and the bar reads 1 of 10 · 84% · on this page · 84%.">
+  <img src="docs/hunch-hero.png" alt="Searching the NixOS manual for &quot;remote install&quot; with Hunch. On a Mac (left) the paragraph about continuing the installation over SSH is highlighted at 0.86 and the bar reads 1 of 13 · 86% · on this page · 76%, with ticks on the right edge marking every hit. On an iPhone in Safari (right) the same paragraph is highlighted at 0.84.">
 </p>
 
 Ctrl+F with a hunch.
