@@ -1,13 +1,7 @@
 import browser from "webextension-polyfill";
 import { answer } from "./background/answer";
 import { SEARCH_PORT, type Search, type SearchEvent, type TabMessage } from "./shared/protocol";
-import {
-  apiOriginPermission,
-  DEFAULT_API_HOST,
-  hasApiAccess,
-  loadSettings,
-  requestApiAccess,
-} from "./shared/settings";
+import { apiOriginPermission, DEFAULT_API_HOST, hasApiAccess, loadSettings, requestApiAccess } from "./shared/settings";
 import { shortcutLabel } from "./shared/shortcut";
 
 async function toggle(tabId: number | undefined) {

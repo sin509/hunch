@@ -1,7 +1,7 @@
 import { TypeSafeClient } from "@typesafe-ai/sdk";
 import { type Block, type BlockId, type Progress, pageText, type Search } from "../shared/protocol";
 import { MAX_CHUNK_BLOCKS, MAX_CHUNK_CHARS, MAX_CONCURRENT_REQUESTS, questionsFor } from "../shared/questions";
-import { type Settings, clientBaseURL } from "../shared/settings";
+import { clientBaseURL, type Settings } from "../shared/settings";
 
 export async function answer(
   req: Search,

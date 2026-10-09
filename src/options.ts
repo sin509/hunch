@@ -5,8 +5,8 @@ import {
   listModels,
   loadSettings,
   requestApiAccess,
-  saveSettings,
   type Settings,
+  saveSettings,
 } from "./shared/settings";
 import {
   canRebindShortcut,
