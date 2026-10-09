@@ -11,6 +11,7 @@
   },
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": ["https://api.typesafe.ai/*"],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
