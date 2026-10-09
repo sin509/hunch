@@ -1,5 +1,13 @@
 import browser from "webextension-polyfill";
-import { DEFAULT_SETTINGS, listModels, loadSettings, requestApiAccess, saveSettings } from "./shared/settings";
+import {
+  apiOriginPermission,
+  DEFAULT_SETTINGS,
+  listModels,
+  loadSettings,
+  requestApiAccess,
+  saveSettings,
+  type Settings,
+} from "./shared/settings";
 import {
   canRebindShortcut,
   commandShortcutFromEvent,
@@ -13,6 +21,7 @@ import {
 
 const field = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const apiKey = field<HTMLInputElement>("apiKey");
+const baseURL = field<HTMLInputElement>("baseURL");
 const model = field<HTMLSelectElement>("model");
 const modelNote = field("modelNote");
 const banner = field("nokey");
@@ -59,11 +68,16 @@ interface ModelChoice {
   description: string;
 }
 
-async function modelChoices(apiKey: string, selected: string): Promise<{ models: ModelChoice[]; note: string }> {
+async function modelChoices(
+  settings: Pick<Settings, "apiKey" | "baseURL">,
+  selected: string,
+): Promise<{ models: ModelChoice[]; note: string }> {
   const current = { name: selected, description: "" };
-  if (!apiKey) return { models: [current], note: "Save an API key to see the models you can use." };
+  if (!settings.apiKey) return { models: [current], note: "Save an API key to see the models you can use." };
+  const perm = apiOriginPermission(settings.baseURL);
+  if ("error" in perm) return { models: [current], note: perm.error };
   try {
-    const models = await listModels(apiKey);
+    const models = await listModels(settings);
     const selectedIsListed = models.some((m) => m.name === selected);
     return { models: selectedIsListed ? models : [current, ...models], note: "" };
   } catch (e) {
@@ -71,8 +85,8 @@ async function modelChoices(apiKey: string, selected: string): Promise<{ models:
   }
 }
 
-async function loadModels(apiKey: string, selected: string) {
-  const { models, note } = await modelChoices(apiKey, selected);
+async function loadModels(settings: Pick<Settings, "apiKey" | "baseURL">, selected: string) {
+  const { models, note } = await modelChoices(settings, selected);
   model.replaceChildren(...models.map((m) => new Option(labelFor(m), m.name, false, m.name === selected)));
   modelNote.textContent = note;
 }
@@ -98,19 +112,30 @@ async function load() {
   shortcut.value = await shortcutLabel();
   const s = await loadSettings();
   apiKey.value = s.apiKey;
-  await loadModels(s.apiKey, s.model);
+  baseURL.value = s.baseURL;
+  await loadModels(s, s.model);
   showKeyBanner(Boolean(s.apiKey));
 }
 
 async function save() {
-  const s = {
+  const s: Settings = {
     apiKey: apiKey.value.trim(),
+    baseURL: baseURL.value.trim(),
     model: model.value || DEFAULT_SETTINGS.model,
   };
-  await requestApiAccess();
+  const perm = apiOriginPermission(s.baseURL);
+  if ("error" in perm) {
+    modelNote.textContent = perm.error;
+    return;
+  }
+  const granted = await requestApiAccess(s.baseURL);
+  if (!granted) {
+    modelNote.textContent = "Permission to reach that API host was not granted.";
+    return;
+  }
   await saveSettings(s);
   showKeyBanner(Boolean(s.apiKey));
-  await loadModels(s.apiKey, s.model);
+  await loadModels(s, s.model);
   saved.textContent = "Saved";
   setTimeout(() => (saved.textContent = ""), 1500);
 }
