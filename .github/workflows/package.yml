@@ -1,0 +1,56 @@
+name: Package extension
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install -g web-ext @biomejs/biome
+
+      - name: Check and package
+        run: |
+          npm run check
+          npm run package
+
+      - name: Release name from branch
+        id: meta
+        run: |
+          slug="${GITHUB_REF_NAME//\//-}"
+          slug="$(echo "$slug" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/-/g; s/--*/-/g; s/^-//; s/-$//')"
+          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+          echo "tag=build-$slug" >> "$GITHUB_OUTPUT"
+
+      - name: Publish branch release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ github.ref_name }}
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          make_latest: false
+          overwrite_files: true
+          body: |
+            Continuous build for branch `${{ github.ref_name }}`.
+
+            - Commit: `${{ github.sha }}`
+            - Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          files: |
+            web-ext-artifacts/firefox/*.zip
+            web-ext-artifacts/chrome/*.zip
