@@ -4,10 +4,25 @@ import { SEARCH_PORT, type Search, type SearchEvent, type TabMessage } from "./s
 import { apiOriginPermission, DEFAULT_API_HOST, hasApiAccess, loadSettings, requestApiAccess } from "./shared/settings";
 import { shortcutLabel } from "./shared/shortcut";
 
+/** Last known base URL so toggle can call permissions.request as its first await (Chrome gesture). */
+let cachedBaseURL = "";
+void loadSettings().then((s) => {
+  cachedBaseURL = s.baseURL;
+});
+browser.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local" || !changes.settings) return;
+  const next = changes.settings.newValue as { baseURL?: string } | undefined;
+  if (next && typeof next.baseURL === "string") cachedBaseURL = next.baseURL;
+});
+
 async function toggle(tabId: number | undefined) {
   if (tabId === undefined) return;
-  const settings = await loadSettings();
-  await requestApiAccess(settings.baseURL);
+  // Chrome drops the user gesture after any prior await; keep requestApiAccess first when possible.
+  try {
+    await requestApiAccess(cachedBaseURL);
+  } catch {
+    // Options Save still grants custom hosts; search checks hasApiAccess.
+  }
   if (!(await ensureContentScript(tabId))) return unavailable(tabId);
   await sendToTab(tabId, { type: "toggle" });
 }
